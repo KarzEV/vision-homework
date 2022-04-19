@@ -120,9 +120,17 @@ namespace homework {
                 throw std::invalid_argument("degenerate matrix");
             }
 
-            int prev_position = position_x[i];
-            position_x[i] = new_position;
-            position_x[new_position] = prev_position;
+            if(new_position != i) {
+                int prev_position = position_x[i];
+                position_x[i] = position_x[new_position];
+                position_x[new_position] = prev_position;
+
+                for(size_t k = 0; k < i; ++k) {
+                    double buf = L_matrix[new_position][k];
+                    L_matrix[new_position][k] = L_matrix[i][k];
+                    L_matrix[i][k] = buf;
+                }
+            }
 
             for (size_t j = i + 1; j < rows_; ++j) {
                 L_matrix[j][i] = U_matrix[j][i] / U_matrix[i][i];
@@ -174,7 +182,7 @@ namespace homework {
             throw std::invalid_argument("matrix is not square");
         }
 
-        auto [_, U, __] = LU();
+        auto [U, _, __] = LU();
 
         double det = data_[0][0];
         for (uint32_t i = 1; i < rows_; ++i) {
@@ -187,38 +195,31 @@ namespace homework {
     MyMatrix MyMatrix::inverse() const {
         MyMatrix in_matrix(rows_, cols_);
 
-        auto [L, U, position_x] = LU();
+        auto [U, L, position_x] = LU();
 
-        for (uint32_t i = 0; i < rows_; ++i) {
-            in_matrix[i][position_x[i]] = 1;
-        }
+        for(size_t i = 0; i < get_rows(); ++i) {
+            MyMatrix b(get_cols(), 1);
+            b[i][0] = 1;
 
-        for (int j = 0; j < rows_; j++) {
-            for (int i = 0; i < cols_; i++) {
-                for (int k = 0; k < i; k++) {
-                    in_matrix[i][j] -= L[i][k] * in_matrix[k][j];
+            b = L.inverse_L() * b;
+            MyMatrix x(get_rows(), 1);
+
+            for(int i = get_rows() - 1; i >= 0; --i) {
+                for(int j = get_cols() - 1; j >= i; --j) {
+                    if(i != j) {
+                        x[i][0] -= U[i][j] * x[j][0];
+                    } else {
+                        x[i][0] = (x[i][0] + b[j][0]) / U[i][j];
+                    }
                 }
-                in_matrix[i][j] /= L[i][i];
             }
 
-            for (int i = rows_ - 1; i >= 0; i--) {
-                for (int k = i + 1; k < rows_; k++) {
-                    in_matrix[i][j] -= U[i][k] * in_matrix[k][j];
-                }
-
-                in_matrix[i][j] /= U[i][i];
+            for(size_t k = 0; k < get_rows(); ++k) {
+                in_matrix[k][position_x[i]] = x[k][0];
             }
         }
 
-        MyMatrix result(in_matrix.rows_, in_matrix.cols_);
-
-        for(size_t j = 0; j < in_matrix.cols_; ++j) {
-            for(size_t i = 0; i < in_matrix.rows_; ++i) {
-                result[i][j] = in_matrix[i][position_x[j]];
-            }
-        }
-
-        return result;
+        return in_matrix;
     }
 
     MyMatrix::MyMatrix(const std::vector<std::vector<double>> &data) : rows_(data.size()),
@@ -228,6 +229,20 @@ namespace homework {
         } else {
             cols_ = 0;
         }
+    }
+
+    MyMatrix MyMatrix::inverse_L() {
+        MyMatrix invers = MyMatrix::gen_identity(get_rows(), get_cols());
+
+        for(int j = get_cols() - 2; j >= 0; --j) {
+            MyMatrix one_M = MyMatrix::gen_identity(get_rows(), get_cols());
+            for(int i = get_rows() - 1; i > j; --i) {
+                one_M[i][j] = - data_[i][j];
+            }
+            invers = invers * one_M;
+        }
+
+        return invers;
     }
 
     std::ostream &operator<<(std::ostream &os, const homework::MyMatrix &matrix) {
@@ -245,9 +260,10 @@ namespace homework {
         if(b.get_cols() != 1) {
             throw std::invalid_argument("incorrect matrix b");
         }
+
         MyMatrix result(b.get_rows(), 1);
 
-        auto [L_matrix, U_matrix, position_x] = A.LU();
+        auto [U_matrix, L_matrix, position_x] = A.LU();
 
         MyMatrix right(b.get_rows(), b.get_cols());
 
@@ -255,14 +271,14 @@ namespace homework {
             right[i][0] = b[position_x[i]][0];
         }
 
-        right = L_matrix.inverse() * right;
+        right = L_matrix.inverse_L() * right;
 
         for(int i = A.get_rows() - 1; i >= 0; --i) {
             for(int j = A.get_cols() - 1; j >= i; --j) {
                 if(i != j) {
                     result[i][0] -= U_matrix[i][j] * result[j][0];
                 } else {
-                    result[i][0] += right[j][0] / U_matrix[i][j];
+                    result[i][0] = (result[i][0] + right[j][0]) / U_matrix[i][j];
                 }
             }
         }

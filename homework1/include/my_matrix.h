@@ -34,17 +34,13 @@ namespace homework {
 
     public:
         explicit MyMatrix(size_t size) : MyMatrix(size, size) {}
-
         MyMatrix(size_t rows, size_t cols);
-
         explicit MyMatrix(const std::vector<std::vector<double>> &data);
 
         MyMatrix(const MyMatrix &other) = default;
-
         MyMatrix &operator=(const MyMatrix &other) = default;
 
         MyMatrix(MyMatrix &&other) = default;
-
         MyMatrix &operator=(MyMatrix &&other) = default;
 
     public:
@@ -75,6 +71,8 @@ namespace homework {
         MyMatrix inverse() const;
 
         static MyMatrix gen_identity(size_t rows, size_t cols);
+
+        MyMatrix inverse_L();
 
     private:
         size_t find_main_element(size_t row, size_t col);

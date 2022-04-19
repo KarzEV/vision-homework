@@ -33,11 +33,13 @@ void test(std::string path) {
 }
 
 int main() {
-//    test("../test_data/test_1.csv");
-//    test("../test_data/test_2.csv");
-    //test("../test_data/test_3.csv");
+    test("../test_data/test_1.csv");
+    test("../test_data/test_2.csv");
+    test("../test_data/test_3.csv");
     test("../test_data/test_4.csv");
-    test("../test_data/test_5.csv");
+    try {
+        test("../test_data/test_5.csv");
+    } catch (const std::invalid_argument&) {}
     test("../test_data/test_6.csv");
 
     std::cout << "tests passed" << std::endl;
