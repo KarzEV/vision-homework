@@ -34,7 +34,6 @@ Eigen::MatrixXd mEstimator(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B) {
     for (uint i = 0; i < 50; ++i) {
         result = (A.transpose() * Weight * A).lu().solve(A.transpose() * Weight * B);
         VectorXd res(B - A * result);
-
         for (uint j = 0; j < res.rows(); j++) {
             Weight(j, j) = 1 / (std::max(delta, fabs(res(j))));
         }
@@ -49,12 +48,12 @@ int main() {
 
     Eigen::MatrixXd B = data.col(0);
     for (long i = 0; i < B.rows(); ++i) {
-        B(i, 0) = std::log(data(i, 0));
+        B(i, 0) = data(i, 1);
     }
     Eigen::MatrixXd A(data.rows(), 2);
 
     for (long i = 0; i < A.rows(); ++i) {
-        A(i, 0) = data(i, 1);
+        A(i, 0) = std::log10(data(i, 0));
         A(i, 1) = 1;
     }
 
