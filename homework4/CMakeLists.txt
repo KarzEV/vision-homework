@@ -1,21 +1,20 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(integration VERSION 0.1.0)
+project(text_detector VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(Eigen3 REQUIRED)
+find_package(OpenCV REQUIRED )
 
-include_directories(include)
+include_directories(include
+                    ${OpenCV_INCLUDE_DIRS})
 
 add_executable(
         ${PROJECT_NAME}
         src/main.cpp
-        src/UniversalSolver.cpp
-        src/test.cpp
 )
 
 target_link_libraries(
         ${PROJECT_NAME}
         PRIVATE
-        Eigen3::Eigen
+        ${OpenCV_LIBS}
 )
