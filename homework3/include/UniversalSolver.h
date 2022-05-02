@@ -55,12 +55,13 @@ public:
 
     UniversalSolver(const Eigen::MatrixXd &butcher_matrix,
                     std::function<Eigen::VectorXd(double, const Eigen::VectorXd &)> recalc_function,
-                    double max_diff = 10e-12, double min_diff = 10e-12);
+                    double max_diff = 10e-10, double min_diff = 10e-10);
+
     void init_values(const Eigen::VectorXd &init_vals, double init_time);
 
     void calc_step() { walker_->calc_step(); }
     [[nodiscard]] double t() const { return time_; }
-    [[nodiscard]] Eigen::VectorXd vals() const { return values_; }
+    [[nodiscard]] Eigen::VectorXd& vals() { return values_; }
     [[nodiscard]] double get_step() const { return walker_->get_step(); }
 
     void set_step(double step) { walker_->set_step(step); }
@@ -77,4 +78,7 @@ private:
 
     double time_ = 0;
 };
+
+[[maybe_unused]] Eigen::MatrixXd get_runge();
+[[maybe_unused]] Eigen::MatrixXd get_DP();
 } // end namespace homework
