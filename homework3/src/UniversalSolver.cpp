@@ -15,7 +15,7 @@ Eigen::MatrixXd Walker::gen_tmp() {
 
     tmp.row(0) = solver_.recalc_function_(solver_.time_, val);
 
-    for(int i = 1; i < solver_.a_.rows(); ++i) {
+    for(int i = 1; i < tmp.rows(); ++i) {
         Eigen::VectorXd val = solver_.values_;
         for(int j = 0; j < i; ++j) {
             val += tmp.row(j) * solver_.a_(i, j) * step_;
@@ -35,8 +35,8 @@ void DPWalker::calc_step() {
     do {
         tmp = gen_tmp();
 
-        x1 = solver_.b_[0] * tmp;
-        x2 = solver_.b_[1] * tmp;
+        x1 = (solver_.b_[0] * tmp).transpose();
+        x2 = (solver_.b_[1] * tmp).transpose();
 
         diff = (x1 - x2).cwiseAbs().maxCoeff();
         if(diff > max_diff_) {
@@ -52,8 +52,10 @@ void DPWalker::calc_step() {
 
 void RungeWalker::calc_step() {
     Eigen::MatrixXd tmp = gen_tmp();
-    Eigen::VectorXd x = solver_.b_[0] * tmp;
-    solver_.values_ = solver_.values_ + x * step_;
+
+    Eigen::VectorXd x = (solver_.b_[0] * tmp).transpose();
+
+    solver_.values_ += x * step_;
     solver_.time_ += step_;
 }
 

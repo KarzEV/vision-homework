@@ -51,13 +51,22 @@ Eigen::VectorXd simple1(double time, const Eigen::VectorXd &val) {
 }
 
 Eigen::VectorXd simple2(double time, const Eigen::VectorXd &val) {
-    Eigen::VectorXd ret(2);
-    ret(0) = 9 * val(0) + 24 * val(1) + cos(time) - 1.0 / 3 * sin(time);
-    ret(1) = -24 * val(0) - 51 * val(1) + 9 * cos(time) + 1.0 / 3 * sin(time);
+    Eigen::VectorXd ret(2, 1);
+    ret(0, 0) = 9 * val(0, 0) + 24 * val(1, 0) + 5 * cos(time) - 1.0 / 3 * sin(time);
+    ret(1, 0) = -24 * val(0, 0) - 51 * val(1, 0) + 9 * cos(time) + 1.0 / 3 * sin(time);
     return ret;
 }
 
-double result1(double time) {
-    return a / b * (time - 1 / b) + 0.57 * exp(-b * time);
+Eigen::VectorXd result1(double time) {
+    Eigen::VectorXd result(1);
+    result(0) =  a / b * (time - 1 / b) + 0.57 * exp(-b * time);
+    return result;
+}
+
+Eigen::VectorXd result2(double time) {
+    Eigen::VectorXd result(2);
+    result(0) = 2.0 * exp(-3 * time) - exp(-39 * time) + 1.0 / 3 * cos(time);
+    result(1) = - exp(-3 * time) + 2.0 * exp(-39 * time) - 1.0 / 3 * cos(time);
+    return result;
 }
 }

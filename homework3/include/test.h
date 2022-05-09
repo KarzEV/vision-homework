@@ -13,7 +13,8 @@ Eigen::VectorXd my_sin(double time, const Eigen::VectorXd& val);
 [[maybe_unused]] Eigen::VectorXd simple1(double time, const Eigen::VectorXd& val);
 [[maybe_unused]] Eigen::VectorXd simple2(double time, const Eigen::VectorXd& val);
 
-[[maybe_unused]] double result1(double time);
+[[maybe_unused]] Eigen::VectorXd result1(double time);
+[[maybe_unused]] Eigen::VectorXd result2(double time);
 
 void test1();
 void test2();
